@@ -1,4 +1,7 @@
 
+#* **** MAZE GENERATOR ****
+#       by Shrey Biswas
+
 
 #* IMPORTS
 import random
