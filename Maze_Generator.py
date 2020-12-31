@@ -99,9 +99,11 @@ def move(current,direction, cellWidth,vis):
         pygame.draw.rect(window, WHITE, (x-cellWidth+1, y+1, cellWidth-2, cellWidth-2),0)
         pygame.draw.rect(window, BLUE, (x, y+1, cellWidth, cellWidth-1),0)
 
-    if vis == True:
-        time.sleep(0.008)
-        pygame.display.update()
+    if vis == False:
+        return
+    
+    time.sleep(0.008)
+    pygame.display.update()
 
 
 def generate_maze(grid, cellWidth,vis):
@@ -139,7 +141,7 @@ def generate_maze(grid, cellWidth,vis):
 
 grid = build_blank_grid()
 
-generate_maze(grid,cellWidth,True)
+generate_maze(grid,cellWidth,False)
 
 
 # ##### pygame loop #######
