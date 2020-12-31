@@ -140,9 +140,9 @@ def generate_maze(grid, cellWidth,vis):
 
 #* main
 
-grid = build_blank_grid()
+#grid = build_blank_grid()
 
-generate_maze(grid,cellWidth,True)
+#generate_maze(grid,cellWidth,True)
 
 
 
