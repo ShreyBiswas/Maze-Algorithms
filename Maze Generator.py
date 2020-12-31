@@ -9,14 +9,11 @@ import time
 import pygame
 
 
-time.sleep(0)
-random.randint(0,1)
-
-#* specifications
+#* display specifications
 screenWidth = 1000
 screenHeight = 500
-FPS = 60
-cellWidth = 20
+FPS = 30
+cellWidth = 10
 
 #* colours
 BLUE  = pygame.Color((0, 0, 255))
