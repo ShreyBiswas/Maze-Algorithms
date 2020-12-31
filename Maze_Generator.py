@@ -13,7 +13,7 @@ import pygame
 screenWidth = 1000
 screenHeight = 500
 FPS = 30
-cellWidth = 10
+cellWidth = 20
 
 #* colours
 BLUE  = pygame.Color((0, 0, 255))
@@ -67,13 +67,14 @@ def find_frontier(cellWidth, cell, grid, visited):
 
     surrounding = [(above,'above'),(below,'below'),(right,'right'),(left,'left')]
     frontier = []
+
     for i in range(len(surrounding)):
         if (surrounding[i][0] in visited) == False and (surrounding[i][0] in grid) == True:
             frontier.append(surrounding[i])
 
     return frontier
 
-def move(current,direction, cellWidth):
+def move(current,direction, cellWidth,vis):
 
     x = current[0]
     y = current[1]
@@ -81,8 +82,9 @@ def move(current,direction, cellWidth):
 
     if direction == 'start':    #* green square fills cell
         pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
-        pygame.display.update()
-        time.sleep(0.025)
+        if vis == True:
+            pygame.display.update()
+            time.sleep(0.010)
         pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth-1),0)
     elif direction == 'above':  #* blue square fills cell, white fills neighbour
         pygame.draw.rect(window, WHITE, (x+1, y-cellWidth+1, cellWidth-2, cellWidth-2),0)
@@ -97,11 +99,12 @@ def move(current,direction, cellWidth):
         pygame.draw.rect(window, WHITE, (x-cellWidth+1, y+1, cellWidth-2, cellWidth-2),0)
         pygame.draw.rect(window, BLUE, (x, y+1, cellWidth, cellWidth-1),0)
 
+    if vis == True:
+        time.sleep(0.008)
+        pygame.display.update()
 
-    pygame.display.update()
 
-
-def generate_maze(grid, cellWidth):
+def generate_maze(grid, cellWidth,vis):
 
     visited = []
     stack = []
@@ -113,22 +116,22 @@ def generate_maze(grid, cellWidth):
 
     while len(stack)>0:
 
-        time.sleep(0.008)
-
-
         frontier = find_frontier(cellWidth,current, grid, visited)
+
         if len(frontier) != 0:
 
             newCell = random.choice(frontier)
-            move(current,newCell[1], cellWidth)
+
+            move(current,newCell[1], cellWidth, vis)
 
             current = newCell[0]
             visited.append(current)
             stack.append(current)
 
+
         else:
             current = stack.pop()
-            move(current, 'start', cellWidth)   #move back along stack
+            move(current, 'start', cellWidth, vis)   #move back along stack
 
 
 
@@ -136,7 +139,7 @@ def generate_maze(grid, cellWidth):
 
 grid = build_blank_grid()
 
-generate_maze(grid,cellWidth)
+generate_maze(grid,cellWidth,True)
 
 
 # ##### pygame loop #######
