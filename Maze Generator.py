@@ -26,12 +26,11 @@ TURQ  = pygame.Color((0, 200, 255))
 #* initialise display
 # pylint: disable=no-member
 pygame.init()
-
-
 window = pygame.display.set_mode((screenWidth,screenHeight))
 window.fill(BLACK)
 pygame.display.set_caption('Maze')
 FramesPerSec = pygame.time.Clock()
+
 
 def build_blank_grid():
     x = 20   #* x axis co-ordinates
@@ -42,11 +41,11 @@ def build_blank_grid():
     cellsY = (screenHeight//cellWidth)-1 #* total number of cells fitting on y axis
     cellsX = (screenWidth//cellWidth)-1  #* total number of cells fitting on x axis
 
-    for i in range(1,cellsY):
+    for _i in range(1,cellsY):
         x = cellWidth      #* reset to start of line
         y += cellWidth     #* move down to next row of cells
 
-        for ii in range(1,cellsX):
+        for _ii in range(1,cellsX):
             pygame.draw.line(window, WHITE, [x, y], [x + cellWidth, y])                           #* top of cell
             pygame.draw.line(window, WHITE, [x + cellWidth, y], [x + cellWidth, y + cellWidth])   #* right of cell
             pygame.draw.line(window, WHITE, [x + cellWidth, y + cellWidth], [x, y + cellWidth])   #* bottom of cell
@@ -57,6 +56,8 @@ def build_blank_grid():
             x += cellWidth
     return grid
 
+
+
 def find_frontier(cellWidth, cell, grid, visited):
     x,y = cell[0],cell[1]
     right = (x+cellWidth,y)
@@ -66,12 +67,11 @@ def find_frontier(cellWidth, cell, grid, visited):
 
     surrounding = [(above,'above'),(below,'below'),(right,'right'),(left,'left')]
     frontier = []
-    for i in range(len(surrounding)):        
+    for i in range(len(surrounding)):
         if (surrounding[i][0] in visited) == False and (surrounding[i][0] in grid) == True:
             frontier.append(surrounding[i])
 
     return frontier
-
 
 def move(current,direction, cellWidth):
 
@@ -130,13 +130,9 @@ def generate_maze(grid, cellWidth):
             current = stack.pop()
             move(current, 'start', cellWidth)   #move back along stack
 
-    
 
 
-
-
-
-
+#* main
 
 grid = build_blank_grid()
 
