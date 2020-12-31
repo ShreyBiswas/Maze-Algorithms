@@ -74,11 +74,12 @@ def find_frontier(cellWidth, cell, grid, visited):
 
     return frontier
 
+
+
+
 def move(current,direction, cellWidth,vis):
 
-    x = current[0]
-    y = current[1]
-
+    x,y = current[0],current[1]
 
     if direction == 'start':    #* green square fills cell
         pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
@@ -141,21 +142,7 @@ def generate_maze(grid, cellWidth,vis):
 
 grid = build_blank_grid()
 
-generate_maze(grid,cellWidth,False)
+generate_maze(grid,cellWidth,True)
 
 
-# ##### pygame loop #######
-running = True
-while running:
 
-
-    # keep running at the at the right speed
-    FramesPerSec.tick(FPS)
-    pygame.display.update()
-
-
-    # process input (events)
-    for event in pygame.event.get():
-        # check for closing the window
-        if event.type == pygame.QUIT:
-            running = False
