@@ -12,7 +12,7 @@ import pygame
 #* display specifications
 screenWidth = 1000
 screenHeight = 500
-FPS = 30
+FPS = 60
 
 
 #* colours
@@ -86,7 +86,7 @@ def move(current,direction, cellWidth,vis):
         pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
         if vis == True:
             pygame.display.update()
-            time.sleep((0.00004*(cellWidth**2)))
+            time.sleep((0.000002*(cellWidth**3)))
         pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth-1),0)
     elif direction == 'above':  #* blue square fills cell, white fills neighbour
         pygame.draw.rect(window, WHITE, (x+1, y-cellWidth+1, cellWidth-2, cellWidth-2),0)
@@ -104,7 +104,7 @@ def move(current,direction, cellWidth,vis):
     if vis == False:
         return
 
-    time.sleep((0.00002*(cellWidth**2)))
+    time.sleep((0.000001*(cellWidth**3)))
     pygame.display.update()
 
 

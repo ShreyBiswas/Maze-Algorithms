@@ -3,7 +3,7 @@ import Maze_Generator as generator
 import time
 
 #* construct maze
-cellWidth = 20
+cellWidth = 10
 grid = generator.build_blank_grid(cellWidth)
 pathDict = generator.generate_maze(grid,cellWidth,True)
 
@@ -46,13 +46,13 @@ def bf_search(grid, pathDict):
 
         current = newCell
 
-        time.sleep((0.00005*(cellWidth**2)))
+        time.sleep((0.0000025*(cellWidth**3)))
 
     while newCell[0]!=start:
         newCell = backDict[current]
         highlight(current,newCell[0],cellWidth,'solve')
         current = newCell[0]
-        time.sleep((0.0001*(cellWidth**2)))
+        time.sleep((0.000005*(cellWidth**3)))
 
 def highlight(current,newCell,cellWidth,situ):
     if situ == 'search':
