@@ -4,8 +4,8 @@ import time
 
 #* construct maze
 cellWidth = 20
-grid = generator.build_blank_grid()
-pathDict = generator.generate_maze(grid,cellWidth,False)
+grid = generator.build_blank_grid(cellWidth)
+pathDict = generator.generate_maze(grid,cellWidth,True)
 
 parentDict = {}
 
@@ -46,13 +46,13 @@ def bf_search(grid, pathDict):
 
         current = newCell
 
-        time.sleep(0.01)
+        time.sleep((0.00005*(cellWidth**2)))
 
     while newCell[0]!=start:
         newCell = backDict[current]
         highlight(current,newCell[0],cellWidth,'solve')
         current = newCell[0]
-        time.sleep(0.05)
+        time.sleep((0.0001*(cellWidth**2)))
 
 def highlight(current,newCell,cellWidth,situ):
     if situ == 'search':
@@ -61,7 +61,7 @@ def highlight(current,newCell,cellWidth,situ):
         pygame.display.update()
     else:
         pygame.draw.rect(generator.window, generator.GREEN, (current[0]+1, current[1]+1, cellWidth-1, cellWidth-1),0)
-        pygame.draw.rect(generator.window, generator.WHITE, (newCell[0]+1, newCell[1]+1, cellWidth-1, cellWidth-1),0)
+        pygame.draw.rect(generator.window, generator.GREY, (newCell[0]+1, newCell[1]+1, cellWidth-1, cellWidth-1),0)
         pygame.display.update()
 
 

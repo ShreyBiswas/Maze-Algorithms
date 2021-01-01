@@ -13,7 +13,7 @@ import pygame
 screenWidth = 1000
 screenHeight = 500
 FPS = 30
-cellWidth = 20
+
 
 #* colours
 BLUE  = pygame.Color((0, 0, 255))
@@ -21,6 +21,7 @@ RED   = pygame.Color((255, 0, 0))
 GREEN = pygame.Color((0, 100, 0))
 BLACK = pygame.Color((0, 0, 0))
 WHITE = pygame.Color((255, 255, 255))
+GREY = pygame.Color((200, 200, 200))
 TURQ  = pygame.Color((0, 200, 255))
 
 #* initialise display
@@ -32,11 +33,11 @@ pygame.display.set_caption('Maze')
 FramesPerSec = pygame.time.Clock()
 
 
-def build_blank_grid():
+def build_blank_grid(cellWidth):
     x = 20   #* x axis co-ordinates
     y = 0   #* y axis co-ordinates
     grid = []
-    cellWidth = 20
+
 
     cellsY = (screenHeight//cellWidth)-1 #* total number of cells fitting on y axis
     cellsX = (screenWidth//cellWidth)-1  #* total number of cells fitting on x axis
@@ -85,7 +86,7 @@ def move(current,direction, cellWidth,vis):
         pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
         if vis == True:
             pygame.display.update()
-            time.sleep(0.01)
+            time.sleep((0.00004*(cellWidth**2)))
         pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth-1),0)
     elif direction == 'above':  #* blue square fills cell, white fills neighbour
         pygame.draw.rect(window, WHITE, (x+1, y-cellWidth+1, cellWidth-2, cellWidth-2),0)
@@ -102,8 +103,8 @@ def move(current,direction, cellWidth,vis):
 
     if vis == False:
         return
-    
-    time.sleep(0.008)
+
+    time.sleep((0.00002*(cellWidth**2)))
     pygame.display.update()
 
 
