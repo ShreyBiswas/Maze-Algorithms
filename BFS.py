@@ -5,17 +5,74 @@ import time
 #* construct maze
 cellWidth = 20
 grid = generator.build_blank_grid()
-generator.generate_maze(grid,cellWidth,False)
-grid.pop(-1)
+pathDict = generator.generate_maze(grid,cellWidth,False)
+
 parentDict = {}
 
-def bf_search(grid):
+
+
+def bf_search(grid, pathDict):
     start = grid[0]
     target = grid[-1]
 
-    frontier = []
-    visited = []
+    backDict = {}
 
+    #* Reverse PathDict to show child->parent relationship
+    for key, value in pathDict.items():
+        try:
+            if value in backDict: 
+                backDict[value].append(key) 
+            else: 
+                backDict[value]=[key]
+        except:
+            for child in value:
+                if child in backDict: 
+                    backDict[child].append(key) 
+                else: 
+                    backDict[child]=[key]
+
+    frontier = []
+
+    current = start
+
+    while current != target:
+        try:
+            frontier+=pathDict[current]
+        except:
+            pass
+
+        newCell = frontier.pop(0)
+        highlight(current,newCell,cellWidth,'search')
+
+        current = newCell
+
+        time.sleep(0.01)
+
+    while newCell[0]!=start:
+        newCell = backDict[current]
+        highlight(current,newCell[0],cellWidth,'solve')
+        current = newCell[0]
+        time.sleep(0.05)
+
+    
+    
+    
+    
+    
+    
+    '''
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     current = start
     frontier.append(current)
     parentDict[current] = [current]
@@ -42,7 +99,7 @@ def bf_search(grid):
         visited.append(current)
         highlight(current,newCell,cellWidth,'search')
         current = newCell
-       
+       '''
 
     #TODO: MAKE SURE TARGET CELL IS SCANNED, STOPS ABOVE. ADD REVERSING DICTIONARY FOR SOLUTION
 '''
@@ -56,16 +113,19 @@ def bf_search(grid):
 '''
 def highlight(current,newCell,cellWidth,situ):
     if situ == 'search':
-        pygame.draw.rect(generator.window, generator.RED, (current[0]+1, current[1]+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(generator.window, generator.WHITE, (newCell[0]+1, newCell[1]+1, cellWidth-2, cellWidth-2),0)
+        pygame.draw.rect(generator.window, generator.RED, (current[0]+1, current[1]+1, cellWidth-1, cellWidth-1),0)
+        pygame.draw.rect(generator.window, generator.WHITE, (newCell[0]+1, newCell[1]+1, cellWidth-1, cellWidth-1),0)
         pygame.display.update()
     else:
-        pygame.draw.rect(generator.window, generator.GREEN, (current[0]+1, current[1]+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(generator.window, generator.WHITE, (newCell[0]+1, newCell[1]+1, cellWidth-2, cellWidth-2),0)
+        pygame.draw.rect(generator.window, generator.GREEN, (current[0]+1, current[1]+1, cellWidth-1, cellWidth-1),0)
+        pygame.draw.rect(generator.window, generator.WHITE, (newCell[0]+1, newCell[1]+1, cellWidth-1, cellWidth-1),0)
         pygame.display.update()
 
 
-bf_search(grid)
+
+
+#main
+bf_search(grid,pathDict)
 
 # ##### pygame loop #######
 running = True

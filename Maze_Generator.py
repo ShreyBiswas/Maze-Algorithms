@@ -18,7 +18,7 @@ cellWidth = 20
 #* colours
 BLUE  = pygame.Color((0, 0, 255))
 RED   = pygame.Color((255, 0, 0))
-GREEN = pygame.Color((0, 255, 0))
+GREEN = pygame.Color((0, 100, 0))
 BLACK = pygame.Color((0, 0, 0))
 WHITE = pygame.Color((255, 255, 255))
 TURQ  = pygame.Color((0, 200, 255))
@@ -81,11 +81,11 @@ def move(current,direction, cellWidth,vis):
 
     x,y = current[0],current[1]
 
-    if direction == 'start':    #* green square fills cell
+    if direction == 'start':    #* turq square fills cell
         pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
         if vis == True:
             pygame.display.update()
-            time.sleep(0.010)
+            time.sleep(0.01)
         pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth-1),0)
     elif direction == 'above':  #* blue square fills cell, white fills neighbour
         pygame.draw.rect(window, WHITE, (x+1, y-cellWidth+1, cellWidth-2, cellWidth-2),0)
@@ -112,6 +112,10 @@ def generate_maze(grid, cellWidth,vis):
     visited = []
     stack = []
 
+    pathDict = {}
+
+
+
     current = grid[0]
     newCell = ((0,0),'start')
     visited.append(current)
@@ -127,6 +131,12 @@ def generate_maze(grid, cellWidth,vis):
 
             move(current,newCell[1], cellWidth, vis)
 
+            try:
+                pathDict[current]+=[newCell[0]]
+            except:
+                pathDict[current] = [newCell[0]]
+
+
             current = newCell[0]
             visited.append(current)
             stack.append(current)
@@ -136,13 +146,14 @@ def generate_maze(grid, cellWidth,vis):
             current = stack.pop()
             move(current, 'start', cellWidth, vis)   #move back along stack
 
+    return pathDict
+
 
 
 #* main
 
 #grid = build_blank_grid()
 
-#generate_maze(grid,cellWidth,True)
-
+#pathDict = generate_maze(grid,cellWidth,True)
 
 
