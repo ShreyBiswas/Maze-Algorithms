@@ -3,7 +3,7 @@ import Maze_Generator as generator
 import time
 
 #* construct maze
-cellWidth = 10
+cellWidth = 20
 grid = generator.build_blank_grid(cellWidth)
 pathDict = generator.generate_maze(grid,cellWidth,True)
 
