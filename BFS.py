@@ -20,15 +20,15 @@ def bf_search(grid, pathDict):
     #* Reverse PathDict to show child->parent relationship
     for key, value in pathDict.items():
         try:
-            if value in backDict: 
-                backDict[value].append(key) 
-            else: 
+            if value in backDict:
+                backDict[value].append(key)
+            else:
                 backDict[value]=[key]
         except:
             for child in value:
-                if child in backDict: 
-                    backDict[child].append(key) 
-                else: 
+                if child in backDict:
+                    backDict[child].append(key)
+                else:
                     backDict[child]=[key]
 
     frontier = []
