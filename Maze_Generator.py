@@ -5,156 +5,168 @@
 
 #* IMPORTS
 import random
-import time
 import pygame
+from time import sleep
+from maze_objects import *
+from screen_details import *
 
-
-#* display specifications
-screenWidth = 1000
-screenHeight = 500
-FPS = 60
-
-
-#* colours
-BLUE  = pygame.Color((0, 0, 255))
-RED   = pygame.Color((255, 0, 0))
-GREEN = pygame.Color((0, 100, 0))
-BLACK = pygame.Color((0, 0, 0))
-WHITE = pygame.Color((255, 255, 255))
-GREY = pygame.Color((200, 200, 200))
-TURQ  = pygame.Color((0, 200, 255))
-
-#* initialise display
 # pylint: disable=no-member
-pygame.init()
-window = pygame.display.set_mode((screenWidth,screenHeight))
-window.fill(BLACK)
-pygame.display.set_caption('Maze')
-FramesPerSec = pygame.time.Clock()
 
-
-def build_blank_grid(cellWidth):
-    x = 20   #* x axis co-ordinates
-    y = 0   #* y axis co-ordinates
+def build_blank_grid():
+    x = 20   #* x axis co-ordinates of the top left cell
+    y = 0   #* y axis co-ordinates of the top left cell
     grid = []
-
 
     cellsY = (screenHeight//cellWidth)-1 #* total number of cells fitting on y axis
     cellsX = (screenWidth//cellWidth)-1  #* total number of cells fitting on x axis
 
-    for _i in range(1,cellsY):
+    for row_num in range(1,cellsY):
+        #* begins at top left corner, works horizontally and moves down in line
+
         x = cellWidth      #* reset to start of line
-        y += cellWidth     #* move down to next row of cells
+        y += cellWidth     #* move down to next row of cell
+        row = []
 
-        for _ii in range(1,cellsX):
-            pygame.draw.line(window, WHITE, [x, y], [x + cellWidth, y])                           #* top of cell
-            pygame.draw.line(window, WHITE, [x + cellWidth, y], [x + cellWidth, y + cellWidth])   #* right of cell
-            pygame.draw.line(window, WHITE, [x + cellWidth, y + cellWidth], [x, y + cellWidth])   #* bottom of cell
-            pygame.draw.line(window, WHITE, [x, y + cellWidth], [x, y])                           #* left of cell
+        for col_num in range(1,cellsX):
+            cell = Node([x,y],cellWidth,window) #* create cell, add to row and draw
+            row.append(cell)
 
-            grid.append((x,y))                                            #* add cell to grid list
+            cell.draw(WHITE)
+            cell.position = (row_num,col_num)
 
-            x += cellWidth
+
+            x += cellWidth  #* move to next cell in row
+
+        grid.append(row)
+        #* [a],[b],[c]
+        #* [d],[e],[f]
+        #* [g],[h],[i]
+
+
     return grid
 
+def add_blocks(grid):
+    setup = True
+    setup_stage = iter(['Start','Target','Weight1','Block'])
+    setup_action = next(setup_stage)
+    print(setup_action)
+    selecting = False
+
+    while setup:
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and setup_action in ('Weight1','Block'):
+                try:
+                    setup_action = next(setup_stage)
+                    print(setup_action)
+                except:
+                    return grid
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if setup_action in ('Start','Target'): #* Selecting 'Start' or 'Target'
+                    for row in grid:
+                        for cell in row:
+                            if cell.rect.collidepoint(event.pos):
+                                cell.draw(YELLOW)
+                                cell.cell_type = setup_action
+
+                                setup_action = next(setup_stage) # advance if cell is clicked
+                                print(setup_action)
+                    continue
 
 
-def find_frontier(cellWidth, cell, grid, visited):
-    x,y = cell[0],cell[1]
-    right = (x+cellWidth,y)
-    left = (x-cellWidth,y)
-    above = (x,y-cellWidth)
-    below = (x,y+cellWidth)
+                selecting = True #* if blocking or weighting, lets you hold down
 
-    surrounding = [(above,'above'),(below,'below'),(right,'right'),(left,'left')]
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                selecting = False
+
+            elif event.type == pygame.MOUSEMOTION:
+                if selecting:
+                    #* check where click is
+                    for row in grid:
+                        for cell in row:
+                            if cell.rect.collidepoint(event.pos):
+                                if setup_action == 'Block':
+                                    cell.draw(BLACK)
+                                    cell.cell_type = 'Block'
+                                elif setup_action == 'Weight1':
+                                    cell.draw(GREY)
+                                    cell.weight += 1
+
+
+
+
+def generate_maze(grid,animate=True): #* Depth-First Generation
+
+    for row in grid: # find start cell
+        for cell in row:
+            cell.children = [] # reset
+            cell.visited = False
+
+            if cell.cell_type == 'Start':
+                current_cell = cell
+
     frontier = []
 
-    for i in range(len(surrounding)):
-        if (surrounding[i][0] in visited) == False and (surrounding[i][0] in grid) == True:
-            frontier.append(surrounding[i])
+    while True:
 
-    return frontier
+        current_cell.visited = True
+        current_cell.children=[] # empty children, to rebuild in maze
+        current_cell.find_neighbours(grid,False) # maze cannot be diagonal
+
+        random.shuffle(current_cell.neighbours)
+
+        frontier = list(filter(lambda cell: cell not in current_cell.neighbours, frontier)) #* if neighbour is in frontier, move it to the end
+
+        frontier+=current_cell.neighbours
 
 
+        try:
+            next_cell = frontier.pop(-1)
+        except:
+            break # if frontier is empty, maze is complete
 
+        current_cell = backtrack(current_cell,next_cell,animate) #* if next_cell is not next to current_cell, finds proper parent
+        next_cell.parent = current_cell
+        current_cell.children.append(next_cell)
 
-def move(current,direction, cellWidth,vis):
+        next_cell.draw(CYAN)
 
-    x,y = current[0],current[1]
-
-    if direction == 'start':    #* turq square fills cell
-        pygame.draw.rect(window, TURQ, (x+1, y+1, cellWidth-2, cellWidth-2),0)
-        if vis == True:
+        if animate:
             pygame.display.update()
-            time.sleep((0.000002*(cellWidth**3)))
-        pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth-1),0)
-    elif direction == 'above':  #* blue square fills cell, white fills neighbour
-        pygame.draw.rect(window, WHITE, (x+1, y-cellWidth+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(window, BLUE, (x+1, y, cellWidth-1, cellWidth),0)
-    elif direction == 'below':
-        pygame.draw.rect(window, WHITE, (x+1, y+cellWidth+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth-1, cellWidth),0)
-    elif direction == 'right':
-        pygame.draw.rect(window, WHITE, (x+cellWidth+1, y+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(window, BLUE, (x+1, y+1, cellWidth, cellWidth-1),0)
-    elif direction == 'left':
-        pygame.draw.rect(window, WHITE, (x-cellWidth+1, y+1, cellWidth-2, cellWidth-2),0)
-        pygame.draw.rect(window, BLUE, (x, y+1, cellWidth, cellWidth-1),0)
+            sleep(cellWidth/4000)
 
-    if vis == False:
-        return
+        current_cell.connect(next_cell,BLUE,False) #diagonal not true
+        current_cell = next_cell
 
-    time.sleep((0.000001*(cellWidth**3)))
+        if animate:
+            pygame.display.update()
+            sleep(cellWidth/2000)
+
     pygame.display.update()
+    return grid
 
+def backtrack(current_cell, next_cell,animate):
+    while current_cell not in next_cell.potential_parents: #* backtracks current_cell towards next_cell
+            if animate:
+                current_cell.draw(BLUE)
+                current_cell.parent.draw(CYAN)
+                sleep(cellWidth/3000)
+                pygame.display.update()
 
-def generate_maze(grid, cellWidth,vis):
-
-    visited = []
-    stack = []
-
-    pathDict = {}
-
-
-
-    current = grid[0]
-    newCell = ((0,0),'start')
-    visited.append(current)
-    stack.append(current)
-
-    while len(stack)>0:
-
-        frontier = find_frontier(cellWidth,current, grid, visited)
-
-        if len(frontier) != 0:
-
-            newCell = random.choice(frontier)
-
-            move(current,newCell[1], cellWidth, vis)
-
-            try:
-                pathDict[current]+=[newCell[0]]
-            except:
-                pathDict[current] = [newCell[0]]
-
-
-            current = newCell[0]
-            visited.append(current)
-            stack.append(current)
-
-
-        else:
-            current = stack.pop()
-            move(current, 'start', cellWidth, vis)   #move back along stack
-
-    return pathDict
-
-
+            current_cell = current_cell.parent
+    return current_cell
 
 #* main
+if __name__ == '__main__':
+    grid = build_blank_grid()
+    grid = add_blocks(grid)
+    grid = generate_maze(grid,animate=True)
 
-#grid = build_blank_grid()
-
-#pathDict = generate_maze(grid,cellWidth,True)
-
-
+    while True:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
