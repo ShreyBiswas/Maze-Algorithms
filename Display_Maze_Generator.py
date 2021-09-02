@@ -45,14 +45,26 @@ def build_blank_grid():
 
     return grid
 
-def add_blocks(grid):
+def add_blocks(grid,start=False,end=False):
     setup = True
-    setup_stage = iter(['Start','Target','Block']) # weight1, weight2
+    setup_stage = ['Start','Target','Block'] # weight1, weight2
+    if start:
+        start.draw(YELLOW)
+        start.cell_type = 'Start'
+        setup_stage.remove('Start')
+    if end:
+        end.draw(YELLOW)
+        end.cell_type = 'Target'
+        setup_stage.remove('Target')
+
+    setup_stage = iter(setup_stage)
     setup_action = next(setup_stage)
+
     print(setup_action)
     selecting = False
 
     while setup:
+        return grid
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -107,6 +119,8 @@ def generate_maze(grid,animate=True): #* Depth-First Generation
 
             if cell.cell_type == 'Start':
                 current_cell = cell
+                if animate:
+                    current_cell.draw(YELLOW)
 
     frontier = []
 
@@ -132,13 +146,17 @@ def generate_maze(grid,animate=True): #* Depth-First Generation
         next_cell.parent = current_cell
         current_cell.children.append(next_cell)
 
-        next_cell.draw(CYAN)
+        if current_cell.cell_type == 'Start':
+            print('start')
+            print(next_cell.corner)
+            print([cell.corner for cell in current_cell.children])
 
         if animate:
+            next_cell.draw(CYAN)
             pygame.display.update()
             sleep(cellWidth/4000)
 
-        current_cell.connect(next_cell,pygame.Color((202, 230, 255)),False) #diagonal not true
+        current_cell.connect(next_cell,GREEN,False) #diagonal is false if maze is called
         current_cell = next_cell
 
         if animate:
@@ -150,19 +168,19 @@ def generate_maze(grid,animate=True): #* Depth-First Generation
 
 def backtrack(current_cell, next_cell,animate):
     while current_cell not in next_cell.potential_parents: #* backtracks current_cell towards next_cell
-            if animate:
-                current_cell.draw(BLUE)
-                current_cell.parent.draw(CYAN)
-                sleep(cellWidth/3000)
-                pygame.display.update()
+        if animate:
+            current_cell.draw(BLUE)
+            current_cell.parent.draw(CYAN)
+            sleep(cellWidth/3000)
+            pygame.display.update()
 
-            current_cell = current_cell.parent
+        current_cell = current_cell.parent
     return current_cell
 
 #* main
 if __name__ == '__main__':
     grid = build_blank_grid()
-    grid = add_blocks(grid)
+    grid = add_blocks(grid,start=grid[0][0],end=grid[-1][-1])
     grid = generate_maze(grid,animate=True)
 
     while True:

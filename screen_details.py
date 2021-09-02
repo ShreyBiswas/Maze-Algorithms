@@ -19,9 +19,9 @@ WHITE = pygame.Color((255, 255, 255)) # unsearched empty cell #ffffff
 
 
 #* display specifications
-screenWidth = 1000
+screenWidth = 500
 screenHeight = 500
-cellWidth = 20
+cellWidth = 30
 FPS = pygame.time.Clock()
 FPS.tick(10)
 

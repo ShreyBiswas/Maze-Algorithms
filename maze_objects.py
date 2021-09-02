@@ -1,4 +1,5 @@
 import pygame
+from screen_details import *
 
 # pylint: disable=no-member
 
@@ -39,16 +40,17 @@ class Node():
         self.weight = 1
 
     def draw(self,colour):
-        if self.cell_type == 'Cell': # don't draw over start, target, block cells
-            self.surf.fill(colour)
-            self.window.blit(self.surf,self.rect)
+        self.surf.fill(colour)
+        self.window.blit(self.surf,self.rect)
 
     def connect(self,node,colour,diagonal):
-        if self.cell_type == 'Cell': # don'nt draw over start, targaet, block cells
-            if diagonal:
-                pygame.draw.line(self.window,colour,self.rect.center,node.rect.center,width=2)
-            else:
-                pygame.draw.rect(self.window,colour,self.rect.union(node.rect)) #* join the two cells
+        if diagonal:
+            pygame.draw.line(self.window,colour,self.rect.center,node.rect.center,width=2)
+        else:
+            pygame.draw.rect(self.window,colour,self.rect.union(node.rect)) #* join the two cells
+
+        if self.cell_type in ('Start','Target'):
+            self.draw(YELLOW)
 
     def find_neighbours(self,grid,diagonal):
         self.neighbours = []

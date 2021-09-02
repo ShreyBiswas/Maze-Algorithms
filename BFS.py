@@ -12,7 +12,7 @@ from Maze_Generator import *
 from screen_details import *
 
 #* PARAMETERS
-maze = False
+maze = True
 if not maze: # maze cannot be diagonal
     diagonal = True
 
@@ -69,7 +69,7 @@ def Breadth_First_Search(grid):
         pygame.display.update()
         sleep(cellWidth/4000)
 
-        if maze:
+        if not maze:
             next_cell.connect(next_cell.parent,RED,diagonal)
         else:
             current_cell.draw(RED)
